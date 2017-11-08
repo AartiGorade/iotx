@@ -2,6 +2,7 @@ import os
 import json
 import threading
 import paho.mqtt.client as mqtt
+import hashlib
 from collections import deque
 from pyspark import SparkContext
 from pyspark.streaming import StreamingContext
@@ -39,6 +40,25 @@ def connectToBroker(broker, port):
     print "Trying to connect to broker..."
     mqttc.connect(broker, port)
     print "Successfully connected!!!"
+
+    childInfo = {}
+    # if hasattr(child, "prev"):
+    childInfo["seqNum"] = DStream.sequenceNum
+    DStream.sequenceNum += 1
+    childInfo["operation"] = "publish"
+    sink ={}
+    sink["type"] = "MQTT"
+    sink["address"] = sparkBroker+":"+str(sparkPort)
+    sink["channel"] = sparkTopic
+    childInfo["sink"] = sink
+    childInfo["parent"] = DStream.parentId
+
+    childInfo["uid"] = hashlib.sha224(
+        childInfo["operation"] + sink["type"]+sink["address"]+ sink["channel"]+childInfo["parent"]).hexdigest()
+
+    DStream.parentId = childInfo["uid"]
+    DStream.sparkDAG.append(childInfo)
+
 
 def extractDag():
     """
@@ -89,7 +109,7 @@ def printSparkDAG():
     for i in range(0, numEvents):
         event = DStream.sparkDAG[i]
         print(" {")
-        print "   id: ", event["id"]
+        print "   seqNum: ", event["seqNum"]
         print "   rddType: ", event["rddType"]
         print "   operationType: ", event["operationType"]
         print "   operation: ", event["operation"]
@@ -112,7 +132,7 @@ if __name__ == "__main__":
     os.environ["PYSPARK_SUBMIT_ARGS"] = SUBMIT_ARGS
 
     # connect to Spark cluster "spark:cluster-host:port"
-    sc = SparkContext("spark://129.21.124.68:7077", appName="iotx")
+    sc = SparkContext("spark://129.21.124.229:7077", appName="iotx")
 
     print("Created Streaming context...")
     ssc = StreamingContext(sc, 15)
@@ -139,7 +159,7 @@ if __name__ == "__main__":
     pairs.pprint()
 
     # print SPARK DAG in JSON readable format
-    printSparkDAG()
+    # printSparkDAG()
 
     # connect to broker
     connectToBroker(sparkBroker, sparkPort)

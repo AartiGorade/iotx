@@ -118,12 +118,13 @@ if __name__ == "__main__":
     os.environ["PYSPARK_SUBMIT_ARGS"] = SUBMIT_ARGS
 
     # connect to Spark cluster "spark:cluster-host:port"
-    sc = SparkContext("spark://129.21.124.68:7077", appName="iotx")
+    sc = SparkContext("spark://129.21.124.229:7077", appName="iotx")
 
     print("Created Streaming context...")
     ssc = StreamingContext(sc, 15)
 
     # mandatory to store checkpointed data for Spark Streaming
+    # temp
     ssc.checkpoint("/Users/Aarti/Documents/Fall2017/Code/CheckpointedData")
 
     print("Creating MQTT stream...")

@@ -15,8 +15,9 @@
 # limitations under the License.
 #
 
+import hashlib
+#import SparkMQTTStage2
 from py4j.protocol import Py4JJavaError
-
 from pyspark.storagelevel import StorageLevel
 from pyspark.serializers import UTF8Deserializer
 from pyspark.streaming import DStream
@@ -50,14 +51,30 @@ class MQTTUtils(object):
                 MQTTUtils._printErrorMsg(ssc.sparkContext)
             raise
 
-        dstream = DStream(jstream, ssc, UTF8Deserializer())
-        dstream.serializableFunction = "None"
-        dstream.operation = "createStream"
-        dstream.additionalInformation = "brokerUrl "+brokerUrl+" topic "+topic
+        # dstream =
+        # dstream.serializableFunction = "None"
+        # dstream.operation = "createStream"
+        # dstream.additionalInformation = "brokerUrl "+brokerUrl+" topic "+topic
+        #
+        # dstream.addChildInDag(dstream)
 
-        dstream.addChildInDag(dstream)
+        childInfo = {}
+        # if hasattr(child, "prev"):
+        childInfo["seqNum"] = DStream.sequenceNum
+        DStream.sequenceNum += 1
+        childInfo["operation"] = "createStream"
+        source ={}
+        source["type"] = "MQTT"
+        source["address"] = brokerUrl
+        source["channel"] = topic
+        childInfo["source"] = source
 
-        return dstream
+        childInfo["uid"] = hashlib.sha224(
+            childInfo["operation"] + source["type"]+source["address"]+ source["channel"]).hexdigest()
+
+        DStream.parentId = childInfo["uid"]
+        DStream.sparkDAG.append(childInfo)
+        return DStream(jstream, ssc, UTF8Deserializer())
 
     @staticmethod
     def _printErrorMsg(sc):

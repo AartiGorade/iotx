@@ -18,6 +18,8 @@
 import sys
 import operator
 import time
+import dill, base64
+import hashlib
 from itertools import chain
 from datetime import datetime
 
@@ -54,6 +56,11 @@ class DStream(object):
      - A time interval at which the DStream generates an RDD
      - A function that is used to generate an RDD after each time interval
     """
+
+    sparkDAG = []
+    parentId = 'None'
+    sequenceNum = 0
+
     def __init__(self, jdstream, ssc, jrdd_deserializer):
         self._jdstream = jdstream
         self._ssc = ssc
@@ -61,6 +68,12 @@ class DStream(object):
         self._jrdd_deserializer = jrdd_deserializer
         self.is_cached = False
         self.is_checkpointed = False
+        self.serializableFunction = None
+        self.rddType = None
+        self.operationType = None
+        self.operation = None
+        self.parent = None
+        self.uid = None
 
     def context(self):
         """
@@ -79,26 +92,68 @@ class DStream(object):
         """
         Return a new DStream containing only the elements that satisfy predicate.
         """
+        serialized = base64.b64encode(dill.dumps(f)).decode("ascii")
+
         def func(iterator):
             return filter(f, iterator)
-        return self.mapPartitions(func, True)
+
+        filterDstream = self.mapPartitions(func, True)
+        filterDstream.serializableFunction = serialized
+        filterDstream.operation = "filter"
+        return filterDstream
 
     def flatMap(self, f, preservesPartitioning=False):
         """
         Return a new DStream by applying a function to all elements of
         this DStream, and then flattening the results
         """
-        def func(s, iterator):
-            return chain.from_iterable(map(f, iterator))
-        return self.mapPartitionsWithIndex(func, preservesPartitioning)
+        serialized = base64.b64encode(dill.dumps(f)).decode("ascii")
+
+        flatMapDstream = self.mapPartitionsWithIndex(f, preservesPartitioning)
+        flatMapDstream.serializableFunction = serialized
+        flatMapDstream.operation = "flatMap"
+        return flatMapDstream
+
+    def addChildInDag(self, child):
+        childInfo = {}
+        # if hasattr(child, "prev"):
+        childInfo["seqNum"] = DStream.sequenceNum
+        DStream.sequenceNum += 1
+        childInfo["operation"] = child.operation
+
+        if child.operationType == "Action":
+            childInfo["parent"] = str(self.uid)
+        elif (self == child):
+            childInfo["parent"] = "MQTT"
+        else:
+            childInfo["parent"] = DStream.parentId
+            childInfo["rddType"] = child.rddType
+            childInfo["closure"] = child.serializableFunction
+            childInfo["operationType"] = child.operationType
+
+        childInfo["uid"] = hashlib.sha224(
+            child.operation + (child.serializableFunction).encode('utf-8') + childInfo["parent"]).hexdigest()
+
+        child.uid = childInfo["uid"]
+        DStream.parentId = childInfo["uid"]
+        DStream.sparkDAG.append(childInfo)
 
     def map(self, f, preservesPartitioning=False):
         """
         Return a new DStream by applying a function to each element of DStream.
         """
+        serialized = base64.b64encode(dill.dumps(f)).decode("ascii")
+
         def func(iterator):
             return map(f, iterator)
-        return self.mapPartitions(func, preservesPartitioning)
+
+        mapDstream = self.mapPartitions(func, preservesPartitioning)
+        mapDstream.serializableFunction = serialized
+        mapDstream.rddType = "MapPartitionsRDD"
+        mapDstream.operationType = "Transformation"
+        mapDstream.operation = "map"
+        self.addChildInDag(mapDstream)
+        return mapDstream
 
     def mapPartitions(self, f, preservesPartitioning=False):
         """
@@ -154,6 +209,7 @@ class DStream(object):
         """
         Apply a function to each RDD in this DStream.
         """
+
         if func.__code__.co_argcount == 1:
             old_func = func
             func = lambda t, rdd: old_func(rdd)
@@ -167,6 +223,14 @@ class DStream(object):
 
         @param num: the number of elements from the first will be printed.
         """
+
+        mapDstream = self
+        # mapDstream.serializableFunction = "None"
+        # mapDstream.rddType = "Value"
+        mapDstream.operationType = "Action"
+        mapDstream.operation = "pprint"
+        self.addChildInDag(mapDstream)
+
         def takeAndPrint(time, rdd):
             taken = rdd.take(num + 1)
             print("-------------------------------------------")
@@ -621,6 +685,12 @@ class TransformedDStream(DStream):
         self.is_cached = False
         self.is_checkpointed = False
         self._jdstream_val = None
+        self.serializableFunction = None
+        self.rddType = None
+        self.operationType = None
+        self.operation = None
+        self.parent = None
+        self.uid = None
 
         # Using type() to avoid folding the functions and compacting the DStreams which is not
         # not strictly an object of TransformedDStream.
