@@ -1,6 +1,7 @@
 import os
 import json
 import threading
+import socket
 import paho.mqtt.client as mqtt
 import hashlib
 from collections import deque
@@ -26,6 +27,21 @@ brokerUrl = "tcp://iot.eclipse.org:1883"
 # Calvin Topic pattern where temperature data is being sent
 topic = "testing/calvin/edu/rit/#"
 
+
+def getHostIpAddress():
+    """
+    Get global Ip Address of the current machine
+    :return: Ip address
+    """
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.connect(("8.8.8.8", 80))
+    ip = s.getsockname()[0]
+    s.close()
+    return ip
+
+# Ip address and port number for Spark cluster
+hostAddress = getHostIpAddress()
+hostPort = "7077"
 
 def connectToBroker(broker, port):
     """
@@ -132,19 +148,16 @@ if __name__ == "__main__":
     os.environ["PYSPARK_SUBMIT_ARGS"] = SUBMIT_ARGS
 
     # connect to Spark cluster "spark:cluster-host:port"
-    sc = SparkContext("spark://129.21.124.229:7077", appName="iotx")
+    #sc = SparkContext("spark://129.21.124.229:7077", appName="iotx-stage2")
+    # connect to Spark cluster "spark:cluster-host:port"
+    sc = SparkContext("spark://"+hostAddress+":"+hostPort, appName="iotx")
 
     print("Created Streaming context...")
+    # reading data every 15 seconds
     ssc = StreamingContext(sc, 15)
 
     # mandatory to store checkpointed data for Spark Streaming
     ssc.checkpoint("/Users/Aarti/Documents/Fall2017/Code/CheckpointedData")
-
-    # broker URI
-    brokerUrl = "tcp://iot.eclipse.org:1883"
-    # topic or topic pattern where temperature data is being sent
-    topic = "testing/calvin/edu/rit/#"
-    # topic = "testing/calvin/edu/rit/const/sensor1"
 
     print("Creating MQTT stream...")
     mqttStream = MQTTUtils.createStream(ssc, brokerUrl, topic)

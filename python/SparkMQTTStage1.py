@@ -32,6 +32,22 @@ brokerUrl = "tcp://iot.eclipse.org:1883"
 topic = "testing/calvin/edu/rit/#"
 
 
+def getHostIpAddress():
+    """
+    Get global Ip Address of the current machine
+    :return: Ip address
+    """
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.connect(("8.8.8.8", 80))
+    ip = s.getsockname()[0]
+    s.close()
+    return ip
+
+# Ip address and port number for Spark cluster
+hostAddress = getHostIpAddress()
+hostPort = "7077"
+
+
 def connectToBroker(broker, port):
     """
     This is the function responsible for creating MQTT client and connecting to the give broker server on desired port
@@ -118,7 +134,7 @@ if __name__ == "__main__":
     os.environ["PYSPARK_SUBMIT_ARGS"] = SUBMIT_ARGS
 
     # connect to Spark cluster "spark:cluster-host:port"
-    sc = SparkContext("spark://129.21.124.229:7077", appName="iotx")
+    sc = SparkContext("spark://"+hostAddress+":"+hostPort, appName="iotx")
 
     print("Created Streaming context...")
     ssc = StreamingContext(sc, 15)
@@ -163,4 +179,4 @@ if __name__ == "__main__":
     print("\n\n SSC waiting for termination...")
 
     # wait for 100 seconds before terminating Spark job execution
-    ssc.awaitTermination(1000)
+    ssc.awaitTermination()
