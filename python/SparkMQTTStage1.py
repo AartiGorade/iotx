@@ -94,7 +94,7 @@ def publishFromQueue():
             sleep(slidingInterval)
 
         data = queue.popleft()
-        print("Publishing new data = ", data)
+        print(data)
         mqttClient.publish(sparkTopic, data)
 
 
@@ -163,7 +163,7 @@ if __name__ == "__main__":
     windowedWordCounts = pairs.reduceByKeyAndWindow(update_1, reverseUpdate_1, windowInterval, slidingInterval)
 
     # pprint is Action. prints first 60 items
-    windowedWordCounts.pprint(60)
+    #windowedWordCounts.pprint(60)
 
     # connect to broker
     connectToBroker(sparkBroker, sparkPort)

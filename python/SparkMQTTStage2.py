@@ -112,13 +112,14 @@ def publishFromQueue():
             sleep(15)
 
         data = queue.popleft()
-        print("Publishing new data...", data)
+        print(data)
         mqttc.publish(sparkTopic, data)
 
 
 def printSparkDAG():
     """
     This is the function responsible to print extracted DAG in JSON readable format
+    Note: required to modify to support Source and Sink JSON
     :return: None
     """
 
