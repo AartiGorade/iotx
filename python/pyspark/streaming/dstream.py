@@ -132,7 +132,7 @@ class DStream(object):
             childInfo["operationType"] = child.operationType
 
         childInfo["uid"] = hashlib.sha224(
-            child.operation + (child.serializableFunction).encode('utf-8') + childInfo["parent"]).hexdigest()
+            child.operation + (str(child.serializableFunction)).encode('utf-8') + childInfo["parent"]).hexdigest()
 
         child.uid = childInfo["uid"]
         DStream.parentId = childInfo["uid"]
