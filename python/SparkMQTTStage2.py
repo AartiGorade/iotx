@@ -159,7 +159,7 @@ if __name__ == "__main__":
     ssc = StreamingContext(sc, 15)
 
     # mandatory to store checkpointed data for Spark Streaming
-    ssc.checkpoint("/Users/Aarti/Documents/Fall2017/Code/CheckpointedData")
+    ssc.checkpoint("/root/SparkCheckpointedData")
 
     print("Creating MQTT stream...")
     mqttStream = MQTTUtils.createStream(ssc, brokerUrl, topic)

@@ -1,12 +1,14 @@
 import os
 import socket
-import paho.mqtt.client as mqtt
 from collections import deque
+from threading import Thread
+from time import sleep
+
+import paho.mqtt.client as mqtt
+
 from pyspark import SparkContext
 from pyspark.streaming import StreamingContext
 from pyspark.streaming.mqtt import MQTTUtils
-from time import sleep
-from threading import Thread
 
 # MQTT client
 mqttc = None
@@ -141,7 +143,7 @@ if __name__ == "__main__":
 
     # mandatory to store checkpointed data for Spark Streaming
     # temp
-    ssc.checkpoint("/Users/Aarti/Documents/Fall2017/Code/CheckpointedData")
+    ssc.checkpoint("/root/SparkCheckpointedData")
 
     print("Creating MQTT stream...")
     mqttStream = MQTTUtils.createStream(ssc, brokerUrl, topic)
