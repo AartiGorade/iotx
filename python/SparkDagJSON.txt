@@ -1,0 +1,41 @@
+
+[
+    {
+        "seqNum": 0,
+        "operation": "createStream",
+        "uid": "1a79c2fb8749d8066acf5ac2503db4b7f3a39c0dbfb143eaa1000a2a",
+        "source":
+            {
+            "type": "MQTT",
+            "channel": "testing/calvin/edu/rit/#",
+            "address": "tcp://iot.eclipse.org:1883"
+            }
+    },
+    {
+        "seqNum": 1,
+        "closure": "gAJjZGlsbC5kaWxsCl9jcmVhdGVfZnVuY3Rpb24KcQAoY2RpbGwuZGlsbApfbG9hZF90eXBlCnEBVQhDb2RlVHlwZXEChXEDUnEEKEsBSwFLAktDVQ18AABqAABkAQCDAQBTcQVOVQEgcQaGcQdVBXNwbGl0cQiFcQlVBGxpbmVxCoVxC1U5L1VzZXJzL0FhcnRpL0lkZWFQcm9qZWN0cy9zcGFyay9weXRob24vU3BhcmtNUVRUU3RhZ2UyLnB5cQxVCDxsYW1iZGE+cQ1LmVUAcQ4pKXRxD1JxEGNfX2J1aWx0aW5fXwpfX21haW5fXwpoDU5OfXERdHESUnETLg==",
+        "rddType": "MapPartitionsRDD",
+        "parent": "1a79c2fb8749d8066acf5ac2503db4b7f3a39c0dbfb143eaa1000a2a",
+        "operationType": "Transformation",
+        "operation": "map",
+        "uid": "b9c0af47d705019bef94bb76d71a47b87c5c01cb206251f51ec12395"
+    },
+    {
+        "seqNum": 2,
+        "operation": "pprint",
+        "uid": "67abfaf240a4e489b1db75a690519eba92ee44c0c2989562cb74c772",
+        "parent": "b9c0af47d705019bef94bb76d71a47b87c5c01cb206251f51ec12395"
+        },
+    {
+        "seqNum": 3,
+        "operation": "publish",
+        "sink":
+            {
+            "type": "MQTT",
+            "channel": "testing/spark/edu/rit/sparkDag",
+            "address": "iot.eclipse.org:1883"
+            },
+        "parent": "67abfaf240a4e489b1db75a690519eba92ee44c0c2989562cb74c772",
+        "uid": "544760fb77b2208f96245eb6eb16f55a2da99533b6b9840663eb226c"
+    }
+]

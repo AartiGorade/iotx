@@ -1,15 +1,17 @@
-import os
-import json
-import threading
-import socket
-import paho.mqtt.client as mqtt
 import hashlib
+import json
+import os
+import socket
+import threading
 from collections import deque
+from time import sleep
+
+import paho.mqtt.client as mqtt
+
 from pyspark import SparkContext
+from pyspark.streaming import DStream
 from pyspark.streaming import StreamingContext
 from pyspark.streaming.mqtt import MQTTUtils
-from pyspark.streaming import DStream
-from time import sleep
 
 # MQTT client
 mqttc = None
@@ -170,9 +172,6 @@ if __name__ == "__main__":
 
     # perform print action
     pairs.pprint()
-
-    # print SPARK DAG in JSON readable format
-    # printSparkDAG()
 
     # connect to broker
     connectToBroker(sparkBroker, sparkPort)
