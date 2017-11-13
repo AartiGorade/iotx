@@ -153,10 +153,12 @@ if __name__ == "__main__":
     #sc = SparkContext("spark://129.21.124.229:7077", appName="iotx-stage2")
     # connect to Spark cluster "spark:cluster-host:port"
     sc = SparkContext("spark://"+hostAddress+":"+hostPort, appName="iotx")
+    sc.setLogLevel("ERROR")
 
     print("Created Streaming context...")
     # reading data every 15 seconds
     ssc = StreamingContext(sc, 15)
+    ssc.setLogLevel("ERROR")
 
     # mandatory to store checkpointed data for Spark Streaming
     ssc.checkpoint("/root/SparkCheckpointedData")

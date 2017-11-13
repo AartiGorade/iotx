@@ -137,6 +137,7 @@ if __name__ == "__main__":
 
     # connect to Spark cluster "spark:cluster-host:port"
     sc = SparkContext("spark://"+hostAddress+":"+hostPort, appName="iotx")
+    sc.setLogLevel("ERROR")
 
     print("Created Streaming context...")
     ssc = StreamingContext(sc, 15)
