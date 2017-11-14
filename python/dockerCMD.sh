@@ -3,5 +3,4 @@ port=$(cat "$master" | grep "Successfully started service 'sparkMaster' on port"
 ip=$(hostname -I | xargs) &
 sleep 3 &
 ./bin/spark-class org.apache.spark.deploy.worker.Worker spark://"$ip":"$port" &
-sleep 5 &
-./bin/spark-submit python/SparkMQTTStage1.py
+sleep 5
