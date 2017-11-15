@@ -159,10 +159,9 @@ if __name__ == "__main__":
     print("Created Streaming context...")
     # reading data every 15 seconds
     ssc = StreamingContext(sc, 15)
-    ssc.setLogLevel("ERROR")
 
     # mandatory to store checkpointed data for Spark Streaming
-    ssc.checkpoint("/root/SparkCheckpointedData")
+    ssc.checkpoint("/Users/Aarti/IdeaProjects/SparkCheckpointedData")
 
     print("Creating MQTT stream...")
     mqttStream = MQTTUtils.createStream(ssc, brokerUrl, topic)
