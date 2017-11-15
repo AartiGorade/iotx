@@ -168,13 +168,13 @@ if __name__ == "__main__":
     mqttStream = MQTTUtils.createStream(ssc, brokerUrl, topic)
 
     # split incoming stream based on space
-    words = mqttStream.map(lambda line: line.split(" "))
+    celsiusTemp = mqttStream.map(lambda line: line.split(" "))
 
-    # Convert unicode input into integer and store each value in pair format
-    pairs = words.map(lambda word: (int(word[0]), 1))
+    # Convert Celsius to Farenheit and store each value in pair format
+    farenheitTemp = celsiusTemp.map(lambda temp: (str((float(temp[0]) * 9 / 5) + 32).decode("utf-8"), 1))
 
     # perform print action
-    pairs.pprint()
+    farenheitTemp.pprint()
 
     # connect to broker
     connectToBroker(sparkBroker, sparkPort)

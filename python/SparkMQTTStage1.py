@@ -73,7 +73,7 @@ def addToQueue(rdd):
     """
 
     rddList = rdd.collect()
-    subList = [int(x[0]) for x in rddList]
+    subList = [float(x[0]) for x in rddList]
     global queue
     queue.extend(subList)
 
@@ -153,7 +153,7 @@ if __name__ == "__main__":
     celsiusTemp = mqttStream.map(lambda line: line.split(" "))
 
     # Convert Celsius to Farenheit and store each value in pair format
-    farenheitTemp = celsiusTemp.map(lambda temp: (str((int(temp[0]) * 9 / 5) + 32).decode("utf-8"), 1))
+    farenheitTemp = celsiusTemp.map(lambda temp: (str((float(temp[0]) * 9 / 5) + 32).decode("utf-8"), 1))
 
     # lambda functions to calculate average using windowing technique
     update_1 = lambda x, y: update(x)
