@@ -144,23 +144,23 @@ if __name__ == "__main__":
 
     # mandatory to store checkpointed data for Spark Streaming
     # temp
-    ssc.checkpoint("/root/SparkCheckpointedData")
+    ssc.checkpoint("/Users/Aarti/IdeaProjects/SparkCheckpointedData")
 
     print("Creating MQTT stream...")
     mqttStream = MQTTUtils.createStream(ssc, brokerUrl, topic)
 
     # split incoming stream based on space
-    words = mqttStream.map(lambda line: line.split(" "))
+    celsiusTemp = mqttStream.map(lambda line: line.split(" "))
 
-    # Convert unicode input into integer and store each value in pair format
-    pairs = words.map(lambda word: (int(word[0]), 1))
+    # Convert Celsius to Farenheit and store each value in pair format
+    farenheitTemp = celsiusTemp.map(lambda temp: (str((int(temp[0]) * 9 / 5) + 32).decode("utf-8"), 1))
 
     # lambda functions to calculate average using windowing technique
     update_1 = lambda x, y: update(x)
     reverseUpdate_1 = lambda x, y: reverseUpdate(x)
 
     # Reduce last 30 seconds of data, every 15 seconds
-    windowedWordCounts = pairs.reduceByKeyAndWindow(update_1, reverseUpdate_1, windowInterval, slidingInterval)
+    windowedWordCounts = farenheitTemp.reduceByKeyAndWindow(update_1, reverseUpdate_1, windowInterval, slidingInterval)
 
     # pprint is Action. prints first 60 items
     #windowedWordCounts.pprint(60)
