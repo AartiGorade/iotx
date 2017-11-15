@@ -104,6 +104,7 @@ def update(x):
     :param x: new value
     :return: current average value
     """
+
     global sumAccum
     global countAccum
     sumAccum += x
@@ -117,6 +118,7 @@ def reverseUpdate(x):
     :param x: old item from last window interval
     :return: current average value
     """
+
     global sumAccum
     global countAccum
     sumAccum -= x

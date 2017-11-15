@@ -1,0 +1,43 @@
+# The line below states we will base our new image on the Latest Official Ubuntu
+FROM ubuntu:latest
+
+#
+# Identify the maintainer of an image
+MAINTAINER Aarti Gorade "ahg1512@rit.edu"
+
+# Update the image to the latest packages
+RUN apt-get update && apt-get upgrade -y
+
+# install python
+RUN apt-get install python -y
+
+# install pip
+RUN apt-get install python-pip -y
+
+# install paho mqtt client
+RUN pip install paho-mqtt
+
+# install Java
+RUN apt-get install default-jre -y
+RUN apt-get install default-jdk -y
+
+# install py4j
+RUN pip install py4j
+
+# install dill
+RUN pip install dill
+
+# install git
+RUN apt-get install git -y
+
+# git clone Apache Spark
+RUN git clone https://github.com/ritiotx/spark.git
+WORKDIR /spark
+
+# start Spark master, Spark slave, Spark in Standalone mode
+# start Stage 1 program to receive continuous incoming data stream of temparature from calvin, find running average of data points in configured window duration with sliding interval
+
+CMD (export SPARK_HOME=/spark && export PYTHONPATH=$SPARK_HOME/python/:$PYTHONPATH && master=$(./sbin/start-master.sh | grep "logging to" | awk 'NF{ print $NF }') && port=$(cat "$master" | grep "Successfully started service 'sparkMaster' on port" | awk 'NF{ print $NF }' | cut -d. -f1) && ip=$(hostname -I | xargs) && ./bin/spark-class org.apache.spark.deploy.worker.Worker spark://"$ip":"$port" &) && (./bin/spark-submit --packages org.apache.bahir:spark-streaming-mqtt_2.11:2.2.0 python/SparkMQTTStage1.py)
+
+# Expose port 80
+EXPOSE 80

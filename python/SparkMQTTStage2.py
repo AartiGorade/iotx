@@ -35,6 +35,7 @@ def getHostIpAddress():
     Get global Ip Address of the current machine
     :return: Ip address
     """
+
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.connect(("8.8.8.8", 80))
     ip = s.getsockname()[0]
@@ -91,6 +92,7 @@ def addToQueue():
     This is the function responsible for adding extracted DAG JSON into the queue
     :return: None
     """
+
     # Keep adding newly extracted DAG JSON in queue
     while True:
         global queue
