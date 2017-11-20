@@ -56,7 +56,6 @@ port = 1883
 # Calvin broker URI
 brokerUrl = "tcp://iot.eclipse.org:1883"
 # Topic from where temperature data is being received
-# topic = "testing/calvin/edu/rit/#"
 topic = "edu/rit/iotx/+/temperature"
 
 # Spark Broker details
@@ -247,8 +246,6 @@ if __name__ == "__main__":
 
     print("Creating MQTT stream...")
     mqttStream = MQTTUtils.createStream(ssc, brokerUrl, topic)
-
-    print("DStream.parentId = ", DStream.parentId)
 
     # split incoming stream based on space
     celsiusTemp = mqttStream.map(lambda line: line.split(" "))

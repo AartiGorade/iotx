@@ -15,13 +15,13 @@
 # limitations under the License.
 #
 
+import base64
 import hashlib
 import operator
 import sys
 import time
 from datetime import datetime
 
-import base64
 import dill
 
 if sys.version < "3":
@@ -128,7 +128,6 @@ class DStream(object):
             childInfo["operationType"] = child.operationType
         else:
             childInfo["parent"] = DStream.parentId
-            print("AddChildInDag old childInfo parent = ", childInfo["parent"])
             childInfo["rddType"] = child.rddType
             childInfo["closure"] = child.serializableFunction
             childInfo["operationType"] = child.operationType
@@ -139,7 +138,6 @@ class DStream(object):
 
         child.uid = childInfo["uid"]
         DStream.parentId = childInfo["uid"]
-        print("AddChildInDag New childInfo parent = ", DStream.parentId)
         DStream.sparkDAG.append(childInfo)
 
     def map(self, f, preservesPartitioning=False):

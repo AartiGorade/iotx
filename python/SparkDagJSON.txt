@@ -21,40 +21,40 @@
 			}
 	},
 	{
-		"closure": "gAJjZGlsbC5kaWxsCl9jcmVhdGVfZnVuY3Rpb24KcQAoY2RpbGwuZGlsbApfbG9hZF90eXBlCnEBVQhDb2RlVHlwZXEChXEDUnEEKEsBSwFLAktDVQ18AABqAABkAQCDAQBTcQVOVQEgcQaGcQdVBXNwbGl0cQiFcQlVBGxpbmVxCoVxC1U5L1VzZXJzL0FhcnRpL0lkZWFQcm9qZWN0cy9zcGFyay9weXRob24vU3BhcmtNUVRUU3RhZ2UyLnB5cQxVCDxsYW1iZGE+cQ1L/FUAcQ4pKXRxD1JxEGNfX2J1aWx0aW5fXwpfX21haW5fXwpoDU5OfXERdHESUnETLg==",
+		"seqNum": 1,
+		"closure": "gAJjZGlsbC5kaWxsCl9jcmVhdGVfZnVuY3Rpb24KcQAoY2RpbGwuZGlsbApfbG9hZF90eXBlCnEBVQhDb2RlVHlwZXEChXEDUnEEKEsBSwFLAktDVQ18AABqAABkAQCDAQBTcQVOVQEgcQaGcQdVBXNwbGl0cQiFcQlVBGxpbmVxCoVxC1U5L1VzZXJzL0FhcnRpL0lkZWFQcm9qZWN0cy9zcGFyay9weXRob24vU3BhcmtNUVRUU3RhZ2UyLnB5cQxVCDxsYW1iZGE+cQ1L+1UAcQ4pKXRxD1JxEGNfX2J1aWx0aW5fXwpfX21haW5fXwpoDU5OfXERdHESUnETLg==",
 		"rddType": "MapPartitionsRDD",
 		"parent": "759aa29bb0713f750b00ba18906d2570651fe91d0657130852707752",
-		"seqNum": 1,
 		"operationType": "Transformation",
 		"operation": "map",
-		"uid": "76c4491d706b198a9d16214c899cb80ff3a29792e1cd9c6a60b0db4a"
+		"uid": "d0bfa88d2a18d4da0e4b78ca352064e945d0766b8a25e86cd291b20c"
 	},
 	{
-		"closure": "gAJjZGlsbC5kaWxsCl9jcmVhdGVfZnVuY3Rpb24KcQAoY2RpbGwuZGlsbApfbG9hZF90eXBlCnEBVQhDb2RlVHlwZXEChXEDUnEEKEsBSwFLBEtDVS90AAB0AQB8AABkAQAZgwEAZAIAFGQDABVkBAAXgwEAagIAZAUAgwEAZAYAZgIAU3EFKE5LAEsJSwVLIFUFdXRmLThxBksBdHEHVQNzdHJxCFUFZmxvYXRxCVUGZGVjb2RlcQqHcQtVBHRlbXBxDIVxDVU5L1VzZXJzL0FhcnRpL0lkZWFQcm9qZWN0cy9zcGFyay9weXRob24vU3BhcmtNUVRUU3RhZ2UyLnB5cQ5VCDxsYW1iZGE+cQ9NAAFVAHEQKSl0cRFScRJjX19idWlsdGluX18KX19tYWluX18KaA9OTn1xE3RxFFJxFS4=",
-		"rddType": "MapPartitionsRDD",
-		"parent": "76c4491d706b198a9d16214c899cb80ff3a29792e1cd9c6a60b0db4a",
 		"seqNum": 2,
+		"closure": "gAJjZGlsbC5kaWxsCl9jcmVhdGVfZnVuY3Rpb24KcQAoY2RpbGwuZGlsbApfbG9hZF90eXBlCnEBVQhDb2RlVHlwZXEChXEDUnEEKEsBSwFLBEtDVS90AAB0AQB8AABkAQAZgwEAZAIAFGQDABVkBAAXgwEAagIAZAUAgwEAZAYAZgIAU3EFKE5LAEsJSwVLIFUFdXRmLThxBksBdHEHVQNzdHJxCFUFZmxvYXRxCVUGZGVjb2RlcQqHcQtVBHRlbXBxDIVxDVU5L1VzZXJzL0FhcnRpL0lkZWFQcm9qZWN0cy9zcGFyay9weXRob24vU3BhcmtNUVRUU3RhZ2UyLnB5cQ5VCDxsYW1iZGE+cQ9L/1UAcRApKXRxEVJxEmNfX2J1aWx0aW5fXwpfX21haW5fXwpoD05OfXETdHEUUnEVLg==",
+		"rddType": "MapPartitionsRDD",
+		"parent": "d0bfa88d2a18d4da0e4b78ca352064e945d0766b8a25e86cd291b20c",
 		"operationType": "Transformation",
 		"operation": "map",
-		"uid": "0628e6a3fcb267922cef59ada985d145f1f55d3de50d2810a26c346d"
+		"uid": "3789d5ad2677286d3473ebadaf2292dc9d228c5eaec1cde277ae8228"
 	},
 	{
 		"seqNum": 3,
 		"operation": "pprint",
 		"operationType": "Action",
-		"parent": "0628e6a3fcb267922cef59ada985d145f1f55d3de50d2810a26c346d",
-		"uid": "9f363286d92bd984e69bf8e620cc96bd0a353c20dd2d9db7f7af2135"
+		"parent": "3789d5ad2677286d3473ebadaf2292dc9d228c5eaec1cde277ae8228",
+		"uid": "8fcdb14193cf4d1781cbc84c72872d0d50b2b1a2256187172a55a08b"
 	},
 	{
 		"seqNum": 4,
 		"operation": "publish",
 		"sink":
 			{
-				"type": "MQTT",
-				"channel": "edu/rit/iotx/cloud/dag",
-				"address": "iot.eclipse.org:1883"
+			"type": "MQTT",
+			"channel": "edu/rit/iotx/cloud/dag",
+			"address": "iot.eclipse.org:1883"
 			},
-		"parent": "9f363286d92bd984e69bf8e620cc96bd0a353c20dd2d9db7f7af2135",
-		"uid": "6007c8a115491558d2b914d2f7b639b2234823a534ab8f204adbe8d1"
+		"parent": "8fcdb14193cf4d1781cbc84c72872d0d50b2b1a2256187172a55a08b",
+		"uid": "73d74deb0edb784d0da6659b185a6c4258e91bdf268eec1ef7f7ae5e"
 	}
 ]

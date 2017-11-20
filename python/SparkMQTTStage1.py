@@ -53,7 +53,7 @@ sparkTopic = "edu/rit/iotx/cloud/average/temperature"
 # Calvin broker URI
 brokerUrl = "tcp://iot.eclipse.org:1883"
 # Topic pattern where temperature data is being sent
-topic = "testing/calvin/edu/rit/#"
+topic = "edu/rit/iotx/+/temperature"
 
 # counters to keep track of running sum and count to calculate average value
 sumAccum = 0

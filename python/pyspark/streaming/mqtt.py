@@ -17,10 +17,11 @@
 
 import hashlib
 
-import PahoMQTT
 from py4j.protocol import Py4JJavaError
 from pyspark.serializers import UTF8Deserializer
 from pyspark.storagelevel import StorageLevel
+
+import PahoMQTT
 from pyspark.streaming import DStream
 
 __all__ = ['MQTTUtils']
@@ -76,8 +77,6 @@ class MQTTUtils(object):
             childInfo["operation"] + source["type"]+source["address"]+str(len(source["channel"]))).hexdigest()
 
         DStream.parentId = childInfo["uid"]
-
-        print("DStream.parentId inside createStream = ",DStream.parentId)
         DStream.sparkDAG.append(childInfo)
         return DStream(jstream, ssc, UTF8Deserializer())
 
