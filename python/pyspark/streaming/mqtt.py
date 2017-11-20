@@ -16,10 +16,11 @@
 #
 
 import hashlib
-#import SparkMQTTStage2
+
+import PahoMQTT
 from py4j.protocol import Py4JJavaError
-from pyspark.storagelevel import StorageLevel
 from pyspark.serializers import UTF8Deserializer
+from pyspark.storagelevel import StorageLevel
 from pyspark.streaming import DStream
 
 __all__ = ['MQTTUtils']
@@ -46,6 +47,7 @@ class MQTTUtils(object):
                 .loadClass("org.apache.spark.streaming.mqtt.MQTTUtilsPythonHelper")
             helper = helperClass.newInstance()
             jstream = helper.createStream(ssc._jssc, brokerUrl, topic, jlevel)
+
         except Py4JJavaError as e:
             if 'ClassNotFoundException' in str(e.java_exception):
                 MQTTUtils._printErrorMsg(ssc.sparkContext)
@@ -66,13 +68,16 @@ class MQTTUtils(object):
         source ={}
         source["type"] = "MQTT"
         source["address"] = brokerUrl
-        source["channel"] = topic
+
+        source["channel"] = list(PahoMQTT.PahoMQTT.topicNames)
         childInfo["source"] = source
 
         childInfo["uid"] = hashlib.sha224(
-            childInfo["operation"] + source["type"]+source["address"]+ source["channel"]).hexdigest()
+            childInfo["operation"] + source["type"]+source["address"]+str(len(source["channel"]))).hexdigest()
 
         DStream.parentId = childInfo["uid"]
+
+        print("DStream.parentId inside createStream = ",DStream.parentId)
         DStream.sparkDAG.append(childInfo)
         return DStream(jstream, ssc, UTF8Deserializer())
 

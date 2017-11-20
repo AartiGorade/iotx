@@ -1,41 +1,60 @@
+### Sample DAG JSON sent from Apache Spark to Calvin
 
 [
-    {
-        "seqNum": 0,
-        "operation": "createStream",
-        "uid": "1a79c2fb8749d8066acf5ac2503db4b7f3a39c0dbfb143eaa1000a2a",
-        "source":
-            {
-            "type": "MQTT",
-            "channel": "testing/calvin/edu/rit/#",
-            "address": "tcp://iot.eclipse.org:1883"
-            }
-    },
-    {
-        "seqNum": 1,
-        "closure": "gAJjZGlsbC5kaWxsCl9jcmVhdGVfZnVuY3Rpb24KcQAoY2RpbGwuZGlsbApfbG9hZF90eXBlCnEBVQhDb2RlVHlwZXEChXEDUnEEKEsBSwFLAktDVQ18AABqAABkAQCDAQBTcQVOVQEgcQaGcQdVBXNwbGl0cQiFcQlVBGxpbmVxCoVxC1U5L1VzZXJzL0FhcnRpL0lkZWFQcm9qZWN0cy9zcGFyay9weXRob24vU3BhcmtNUVRUU3RhZ2UyLnB5cQxVCDxsYW1iZGE+cQ1LmVUAcQ4pKXRxD1JxEGNfX2J1aWx0aW5fXwpfX21haW5fXwpoDU5OfXERdHESUnETLg==",
-        "rddType": "MapPartitionsRDD",
-        "parent": "1a79c2fb8749d8066acf5ac2503db4b7f3a39c0dbfb143eaa1000a2a",
-        "operationType": "Transformation",
-        "operation": "map",
-        "uid": "b9c0af47d705019bef94bb76d71a47b87c5c01cb206251f51ec12395"
-    },
-    {
-        "seqNum": 2,
-        "operation": "pprint",
-        "uid": "67abfaf240a4e489b1db75a690519eba92ee44c0c2989562cb74c772",
-        "parent": "b9c0af47d705019bef94bb76d71a47b87c5c01cb206251f51ec12395"
-        },
-    {
-        "seqNum": 3,
-        "operation": "publish",
-        "sink":
-            {
-            "type": "MQTT",
-            "channel": "testing/spark/edu/rit/sparkDag",
-            "address": "iot.eclipse.org:1883"
-            },
-        "parent": "67abfaf240a4e489b1db75a690519eba92ee44c0c2989562cb74c772",
-        "uid": "544760fb77b2208f96245eb6eb16f55a2da99533b6b9840663eb226c"
-    }
+	{
+		"seqNum": 0,
+		"operation": "createStream",
+		"uid": "759aa29bb0713f750b00ba18906d2570651fe91d0657130852707752",
+		"source":
+			{
+				"type": "MQTT",
+				"channel":
+					[
+						"edu/rit/iotx/12f8a006-32df-4d76-a386-f480c9da911c/temperature",
+						"edu/rit/iotx/0e072880-73f6-4feb-b8b9-ce1e2e8b6d42/temperature",
+						"edu/rit/iotx/8c4f7919-a478-4817-83b1-89114d342308/temperature",
+						"edu/rit/iotx/b86b973b-571f-41f8-a5c7-d0acad6ba08c/temperature",
+						"edu/rit/iotx/fb36aa87-115b-4b62-94f1-68563b13e6f4/temperature",
+						"edu/rit/iotx/3a51a92c-ed19-4dc9-80a8-56ed7a78cdd1/temperature"
+					],
+				"address": "tcp://iot.eclipse.org:1883"
+			}
+	},
+	{
+		"closure": "gAJjZGlsbC5kaWxsCl9jcmVhdGVfZnVuY3Rpb24KcQAoY2RpbGwuZGlsbApfbG9hZF90eXBlCnEBVQhDb2RlVHlwZXEChXEDUnEEKEsBSwFLAktDVQ18AABqAABkAQCDAQBTcQVOVQEgcQaGcQdVBXNwbGl0cQiFcQlVBGxpbmVxCoVxC1U5L1VzZXJzL0FhcnRpL0lkZWFQcm9qZWN0cy9zcGFyay9weXRob24vU3BhcmtNUVRUU3RhZ2UyLnB5cQxVCDxsYW1iZGE+cQ1L/FUAcQ4pKXRxD1JxEGNfX2J1aWx0aW5fXwpfX21haW5fXwpoDU5OfXERdHESUnETLg==",
+		"rddType": "MapPartitionsRDD",
+		"parent": "759aa29bb0713f750b00ba18906d2570651fe91d0657130852707752",
+		"seqNum": 1,
+		"operationType": "Transformation",
+		"operation": "map",
+		"uid": "76c4491d706b198a9d16214c899cb80ff3a29792e1cd9c6a60b0db4a"
+	},
+	{
+		"closure": "gAJjZGlsbC5kaWxsCl9jcmVhdGVfZnVuY3Rpb24KcQAoY2RpbGwuZGlsbApfbG9hZF90eXBlCnEBVQhDb2RlVHlwZXEChXEDUnEEKEsBSwFLBEtDVS90AAB0AQB8AABkAQAZgwEAZAIAFGQDABVkBAAXgwEAagIAZAUAgwEAZAYAZgIAU3EFKE5LAEsJSwVLIFUFdXRmLThxBksBdHEHVQNzdHJxCFUFZmxvYXRxCVUGZGVjb2RlcQqHcQtVBHRlbXBxDIVxDVU5L1VzZXJzL0FhcnRpL0lkZWFQcm9qZWN0cy9zcGFyay9weXRob24vU3BhcmtNUVRUU3RhZ2UyLnB5cQ5VCDxsYW1iZGE+cQ9NAAFVAHEQKSl0cRFScRJjX19idWlsdGluX18KX19tYWluX18KaA9OTn1xE3RxFFJxFS4=",
+		"rddType": "MapPartitionsRDD",
+		"parent": "76c4491d706b198a9d16214c899cb80ff3a29792e1cd9c6a60b0db4a",
+		"seqNum": 2,
+		"operationType": "Transformation",
+		"operation": "map",
+		"uid": "0628e6a3fcb267922cef59ada985d145f1f55d3de50d2810a26c346d"
+	},
+	{
+		"seqNum": 3,
+		"operation": "pprint",
+		"operationType": "Action",
+		"parent": "0628e6a3fcb267922cef59ada985d145f1f55d3de50d2810a26c346d",
+		"uid": "9f363286d92bd984e69bf8e620cc96bd0a353c20dd2d9db7f7af2135"
+	},
+	{
+		"seqNum": 4,
+		"operation": "publish",
+		"sink":
+			{
+				"type": "MQTT",
+				"channel": "edu/rit/iotx/cloud/dag",
+				"address": "iot.eclipse.org:1883"
+			},
+		"parent": "9f363286d92bd984e69bf8e620cc96bd0a353c20dd2d9db7f7af2135",
+		"uid": "6007c8a115491558d2b914d2f7b639b2234823a534ab8f204adbe8d1"
+	}
 ]

@@ -95,13 +95,13 @@ if __name__ == "__main__":
     to perform evaluation
     '''
 
-    sc = SparkContext("spark://129.21.124.134:7077", appName="iotx")
+    sc = SparkContext("local", appName="iotx")
 
     #### *****************************
     text_file = sc.textFile("/Users/Aarti/Documents/Fall2017/Code/spark-2.2.0/Input.txt")
     # text_file = sc.parallelize([1,2,3,4,5,6,7,8,9,10])
 
-    convertFunc = lambda x: (float(x) - 32) * .5556
+    convertFunc = lambda x,y: (float(x+y) - 32) * .5556
 
     mapRDD_1 = text_file.map(convertFunc)
 
@@ -109,23 +109,23 @@ if __name__ == "__main__":
 
     countFunc = lambda word: (word, 1)
     mapRDD_2 = mapRDD_1.map(countFunc)
-    print mapRDD_2.collect()
-    print mapRDD_1.collect()
+    # print mapRDD_2.collect()
+    # print mapRDD_1.collect()
 
-    printSparkDAG()
-
+    # printSparkDAG()
+    #
     # print "Creating SPARK DAG..."
     # sparkDag = createDAG(mapRDD_2)
 
     print "\nConverting SPARK DAG into JSON..."
-    # sparkDagJson = json.dumps(RDD.sparkDAG)
+    sparkDagJson = json.dumps(RDD.sparkDAG)
 
-    with open('SparkDAGJson.txt', 'w') as outfile:
-        json.dump(RDD.sparkDAG, outfile)
+    # with open('SparkDAGJson.txt', 'w') as outfile:
+    #     json.dump(RDD.sparkDAG, outfile)
 
-        #
-        # print "Transferring DAG from SPARK to Calvin...\n"
-        # transferJsonToCalvin(sparkDagJson)
+
+    print "Transferring DAG from SPARK to Calvin...\n"
+    transferJsonToCalvin(sparkDagJson)
 
         #### *****************************
         # print mapRDD_2.collect()
