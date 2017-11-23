@@ -726,6 +726,7 @@ class TransformedDStream(DStream):
         self.is_cached = False
         self.is_checkpointed = False
         self._jdstream_val = None
+        # customized parameters for Stage 2 iotx
         self.serializableFunction = None
         self.rddType = None
         self.operationType = None

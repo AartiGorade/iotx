@@ -3,8 +3,11 @@
 # by Apache Spark and Edge computing framework is Calvin. Apache Spark is
 # receiving temperature data from Calvin via MQTT (pub/sub model). This
 # program tracks sequence of operations in JSON format at Apache Spark and
-# send it to Calvin via MQTT. Only Paho MQTT client package is used to
-# generate DStream and collect topic names.
+# send it to Calvin via MQTT. Spark MQTT Assembly package is used to create
+# DStream and Paho MQTT client package is used to collect topic names from MQTT
+# Payload.
+# Two MQTT subscribers for the same topic. Use of Spark MQTT Assembly package
+# is removed and only Paho MQTT client package is used in SparkMQTTStage2.py
 #
 # iotx stage 2 demo
 #
@@ -249,13 +252,11 @@ if __name__ == "__main__":
     mqttStream = MQTTUtils.createStream(ssc, brokerUrl, topic)
 
     # split incoming stream based on space
-    #celsiusTemp = mqttStream.map(lambda line: line.split(" "))
-    celsiusTemp = mqttStream.map(lambda line: float(line))
-
+    celsiusTemp = mqttStream.map(lambda line: line.split(" "))
 
     # Convert Celsius to Farenheit and store each value in pair format
     farenheitTemp = celsiusTemp.map(
-        lambda temp: (str(((temp[0]) * 9 / 5) + 32).decode("utf-8"), 1))
+        lambda temp: (str((float(temp[0]) * 9 / 5) + 32).decode("utf-8"), 1))
 
     # perform print action
     farenheitTemp.pprint()
