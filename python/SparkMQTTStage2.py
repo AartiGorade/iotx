@@ -29,7 +29,6 @@
 
 import hashlib
 import json
-import os
 import socket
 import threading
 from collections import deque
@@ -42,7 +41,6 @@ import PahoMQTT
 from pyspark import SparkContext
 from pyspark.streaming import DStream
 from pyspark.streaming import StreamingContext
-from pyspark.streaming.mqtt import MQTTUtils
 
 # MQTT client
 mqttc = None
@@ -128,6 +126,7 @@ def updateTopicNames():
     """
     source = DStream.sparkDAG[0]
     source["source"]["channel"] = list(PahoMQTT.PahoMQTT.topicNames)
+
     source["uid"] = hashlib.sha224(
         source["operation"] + source["source"]["type"] + source["source"][
             "address"] + str(
@@ -182,31 +181,6 @@ def publishFromQueue():
         mqttc.publish(sparkTopic, data)
 
 
-def printSparkDAG():
-    """
-    This is the function responsible to print extracted DAG in JSON readable
-    format
-    Note: required to modify to support Source and Sink JSON
-    :return: None
-    """
-
-    numEvents = len(DStream.sparkDAG)
-    print("[")
-    for i in range(0, numEvents):
-        event = DStream.sparkDAG[i]
-        print(" {")
-        print "   seqNum: ", event["seqNum"]
-        print "   rddType: ", event["rddType"]
-        print "   operationType: ", event["operationType"]
-        print "   operation: ", event["operation"]
-        print "   closure: ", event["closure"]
-        print "   additional Information: ", event["additionalInformation"]
-        print "   parent: ", event["parent"]
-        print "   uid: ", event["uid"]
-        print(" }")
-    print("]")
-
-
 def getTopicNames():
     """
     Get topic names from received MQTT payload
@@ -216,17 +190,63 @@ def getTopicNames():
     rc = mqttTopicClient.run(broker, port, topic)
 
 
+def WriteDataToSocket():
+    """
+    Data received from MQTT broker is written to socket to generate DStream
+    :return: None
+    """
+
+    port = 9999                    # Reserve a port for your service.
+    s = socket.socket()             # Create a socket object
+    host = socket.gethostname()     # Get local machine name
+    s.bind(("localhost", port))            # Bind to the port
+    s.listen(5)                     # Now wait for client connection.
+
+    while True:
+        conn, addr = s.accept()     # Establish connection with client.
+        pahoMqttQueue = PahoMQTT.PahoMQTT().mqttDataQueue
+        while True:
+            while not(pahoMqttQueue):
+                sleep(1)
+
+            data = pahoMqttQueue.popleft()
+            conn.send(data+"\n")
+
+        conn.send('Thank you for connecting')
+        conn.close()
+
+
+def collectDataFromMqttBroker():
+    """
+    Collects data from MQTT broker using Paho Client
+    :return: None
+    """
+    mqttTopicClient = PahoMQTT.PahoMQTT()
+    rc = mqttTopicClient.run(mqttTopicClient.brokerFromCalvin,
+                             mqttTopicClient.portFromCalvin, topic)
+
+
+def getMqttData():
+    """
+    Collects data from MQTT broker using Paho Client and Write data to socket to
+     generate DStream
+    :return: None
+    """
+
+    collectDataFromMqttBrokerWorker = Thread(target=collectDataFromMqttBroker)
+    collectDataFromMqttBrokerWorker.setDaemon(True)
+    collectDataFromMqttBrokerWorker.start()
+    sleep(2)
+    writeDataToSocketWorker = Thread(target=WriteDataToSocket)
+    writeDataToSocketWorker.setDaemon(True)
+    writeDataToSocketWorker.start()
+
+
 if __name__ == "__main__":
     '''
     This is the main function responsible for collecting DAG from Spark and off 
     loading to Calvin client to perform evaluation
     '''
-
-    # Load spark streaming mqtt package at runtime
-    SUBMIT_ARGS = "--packages " \
-                  "org.apache.spark:spark-streaming-mqtt-assembly_2.11:1.5.0 " \
-                  "pyspark-shell"
-    os.environ["PYSPARK_SUBMIT_ARGS"] = SUBMIT_ARGS
 
     # connect to Spark cluster "spark:cluster-host:port"
     sc = SparkContext("spark://" + hostAddress + ":" + hostPort, appName="iotx")
@@ -239,19 +259,24 @@ if __name__ == "__main__":
     # mandatory to store checkpointed data for Spark Streaming
     ssc.checkpoint("/Users/Aarti/IdeaProjects/SparkCheckpointedData")
 
-    # create worker thread to fetch topic names from Calvin topic and store in
-    # dictionary
-    getCalvinTopics = Thread(target=getTopicNames)
-    getCalvinTopics.setDaemon(True)
-    getCalvinTopics.start()
+    # # create worker thread to fetch topic names from Calvin topic and store in
+    # # dictionary
+    # getCalvinTopics = Thread(target=getTopicNames)
+    # getCalvinTopics.setDaemon(True)
+    # getCalvinTopics.start()
 
-    print("Creating MQTT stream...")
-    mqttStream = MQTTUtils.createStream(ssc, brokerUrl, topic)
+    collectMqttDataWorker = Thread(target=getMqttData)
+    collectMqttDataWorker.setDaemon(True)
+    collectMqttDataWorker.start()
 
-    # split incoming stream based on space
-    #celsiusTemp = mqttStream.map(lambda line: line.split(" "))
+    host = socket.gethostname()     # Get local machine name
+    port = 9999                    # Reserve a port for your service.
+
+    print("Creating DStream ...")
+    mqttStream = ssc.socketTextStream("localhost", port)
+
+    # Convert incoming stream items to float values
     celsiusTemp = mqttStream.map(lambda line: float(line))
-
 
     # Convert Celsius to Farenheit and store each value in pair format
     farenheitTemp = celsiusTemp.map(

@@ -13,6 +13,8 @@
 ########################################################################
 
 
+from collections import deque
+
 import paho.mqtt.client as mqtt
 
 
@@ -22,8 +24,14 @@ class PahoMQTT(mqtt.Client):
     published by Calvin and collects all different topic names
     """
 
+    brokerFromCalvin = "iot.eclipse.org"
+    portFromCalvin = 1883
+
     # set to store all unique topic names
     topicNames = set()
+
+    # set to store all unique topic names
+    mqttDataQueue = deque([])
 
     def on_message(self, mqttc, obj, msg):
         """
@@ -33,7 +41,9 @@ class PahoMQTT(mqtt.Client):
         :param msg: data mqtt payload
         :return: None
         """
+
         PahoMQTT.topicNames.add(msg.topic)
+        PahoMQTT.mqttDataQueue.append(msg.payload)
 
     def run(self, broker, port, topic):
         """

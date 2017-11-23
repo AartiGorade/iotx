@@ -17,17 +17,19 @@
 
 from __future__ import print_function
 
-import os
-import sys
+import hashlib
 
 from py4j.java_gateway import java_import, JavaObject
-
-from pyspark import RDD, SparkConf
-from pyspark.serializers import NoOpSerializer, UTF8Deserializer, CloudPickleSerializer
 from pyspark.context import SparkContext
+from pyspark.serializers import NoOpSerializer, UTF8Deserializer, \
+    CloudPickleSerializer
 from pyspark.storagelevel import StorageLevel
 from pyspark.streaming.dstream import DStream
-from pyspark.streaming.util import TransformFunction, TransformFunctionSerializer
+from pyspark.streaming.util import TransformFunction, \
+    TransformFunctionSerializer
+
+import PahoMQTT
+from pyspark import RDD, SparkConf
 
 __all__ = ["StreamingContext"]
 
@@ -265,6 +267,28 @@ class StreamingContext(object):
         @param port:          Port to connect to for receiving data
         @param storageLevel:  Storage level to use for storing the received objects
         """
+
+        # add Source information in JSON
+        childInfo = {}
+        childInfo["seqNum"] = DStream.sequenceNum
+        DStream.sequenceNum += 1
+        childInfo["operation"] = "createStream"
+        source ={}
+        source["type"] = "MQTT"
+        mqttTopicClient = PahoMQTT.PahoMQTT()
+        source["address"] = \
+            mqttTopicClient.brokerFromCalvin+"::"+str(mqttTopicClient\
+                .portFromCalvin)
+
+        source["channel"] = list(mqttTopicClient.topicNames)
+        childInfo["source"] = source
+
+        childInfo["uid"] = hashlib.sha224(
+            childInfo["operation"] + source["type"]+source["address"]+str(len(source["channel"]))).hexdigest()
+
+        DStream.parentId = childInfo["uid"]
+        DStream.sparkDAG.append(childInfo)
+
         jlevel = self._sc._getJavaStorageLevel(storageLevel)
         return DStream(self._jssc.socketTextStream(hostname, port, jlevel), self,
                        UTF8Deserializer())
