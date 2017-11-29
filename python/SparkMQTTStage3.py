@@ -1,20 +1,20 @@
 ########################################################################
-# This is implementation for Cloud + Edge = iotx Stage 2. Cloud is represented
+# This is implementation for Stage 3 Edge-only approach. Cloud is represented
 # by Apache Spark and Edge computing framework is Calvin. Apache Spark is
 # receiving temperature data from Calvin via MQTT (pub/sub model). This
 # program tracks sequence of operations in JSON format at Apache Spark and
 # send it to Calvin via MQTT. Only Paho MQTT client package is used to
 # generate DStream and collect topic names.
 #
-# iotx stage 2 demo
+# iotx stage 3 demo
 #
 # Author: Aarti Gorade
 # Email: ahg1512@rit.edu
 #
 # Invocation:
 #
-# Docker image: aarti/sparkstage2-iotx
-# Docker file: DockerfileSparkMQTTStage2
+# Docker image: aarti/sparkstage3-iotx
+# Docker file: DockerfileSparkMQTTStage3
 #
 # OR
 #
@@ -23,15 +23,14 @@
 #   ./bin/spark-class org.apache.spark.deploy.worker.Worker spark://<Spark
 # Master's Ip address>:<Spark Master's Port>
 #   ./bin/spark-submit
-# --packages org.apache.spark:spark-streaming-mqtt-assembly_2.11:1.5.0
-# python/SparkMQTTStage2.py
+# --packages org.apache.spark:spark-streaming-mqtt-assembly_2.11:1.5.0 python/SparkMQTTStage3.py
 #
 ########################################################################
 
 import hashlib
 import json
-import os
 import socket
+import threading
 from collections import deque
 from threading import Thread
 from time import sleep
@@ -39,8 +38,6 @@ from time import sleep
 import paho.mqtt.client as mqtt
 
 import PahoMQTT
-from DagModification import DagModification
-from SparkMQTTStage2_1 import CalvinToSpark
 from pyspark import SparkContext
 from pyspark.streaming import DStream
 from pyspark.streaming import StreamingContext
@@ -66,11 +63,6 @@ sparkBroker = "iot.eclipse.org"
 sparkPort = 1883
 # Spark mqtt topic where directed acyclic graph information is being sent
 sparkTopic = "edu/rit/iotx/cloud/dag"
-
-# window and sliding interval using for calculating average over each window of
-# incoming Spar Stream
-windowInterval = 30
-slidingInterval = 15
 
 
 def getHostIpAddress():
@@ -167,9 +159,7 @@ def addToQueue():
         global queue
         queue.append(extractDag())
         # wait for 5 seconds before queueing next DAG JSON
-        sleep(10)
-        if(DagModification.stopDagModification):
-            break
+        sleep(5)
 
 
 def publishFromQueue():
@@ -189,8 +179,6 @@ def publishFromQueue():
         data = queue.popleft()
         print(data)
         mqttc.publish(sparkTopic, data)
-        if(DagModification.stopDagModification):
-            break
 
 
 def getTopicNames():
@@ -260,11 +248,6 @@ if __name__ == "__main__":
     loading to Calvin client to perform evaluation
     '''
 
-    SUBMIT_ARGS = "--packages " \
-                  "org.apache.spark:spark-streaming-mqtt-assembly_2.11:1.5.0 " \
-                  "pyspark-shell"
-    os.environ["PYSPARK_SUBMIT_ARGS"] = SUBMIT_ARGS
-
     # connect to Spark cluster "spark:cluster-host:port"
     sc = SparkContext("spark://" + hostAddress + ":" + hostPort, appName="iotx")
     sc.setLogLevel("ERROR")
@@ -274,8 +257,13 @@ if __name__ == "__main__":
     ssc = StreamingContext(sc, 15)
 
     # mandatory to store checkpointed data for Spark Streaming
-    # ssc.checkpoint("/Users/Aarti/IdeaProjects/SparkCheckpointedData")
-    ssc.checkpoint("../tmp/SparkCheckpointedData")
+    ssc.checkpoint("/Users/Aarti/IdeaProjects/SparkCheckpointedData")
+
+    # # create worker thread to fetch topic names from Calvin topic and store in
+    # # dictionary
+    # getCalvinTopics = Thread(target=getTopicNames)
+    # getCalvinTopics.setDaemon(True)
+    # getCalvinTopics.start()
 
     collectMqttDataWorker = Thread(target=getMqttData)
     collectMqttDataWorker.setDaemon(True)
@@ -288,11 +276,14 @@ if __name__ == "__main__":
     mqttStream = ssc.socketTextStream("localhost", port)
 
     # Convert incoming stream items to float values
-    celsiusTemp = mqttStream.map(lambda line: float(line))
+    #celsiusTemp = mqttStream.map(lambda line: float(line))
 
     # Convert Celsius to Farenheit and store each value in pair format
-    farenheitTemp = celsiusTemp.map(
-        lambda temp: (str(((temp[0]) * 9 / 5) + 32).decode("utf-8"), 1))
+    # farenheitTemp = celsiusTemp.map(
+    #     lambda temp: (str(((temp[0]) * 9 / 5) + 32).decode("utf-8"), 1))
+
+    farenheitTemp = mqttStream.map(
+        lambda temp: ((temp * 9 / 5) + 32), 1)
 
     # perform print action
     farenheitTemp.pprint()
@@ -301,26 +292,8 @@ if __name__ == "__main__":
     connectToBroker(sparkBroker, sparkPort)
 
     # Worker thread to perform operation to add newly extracted data into queue
-    t1 = Thread(target=addToQueue)
-    t1.setDaemon(True)
-    t1.start()
+    t = threading.Timer(10.0, addToQueue)
+    t.start()
 
     # Get DAG JSON from queue and publish to broker for Calvin usage
-    t2 = Thread(target=publishFromQueue)
-    t2.setDaemon(True)
-    t2.start()
-
-    sleep(30)
-
-    # stop modification of DAG further
-    DagModification.stopDagModification = True
-
-    ssc.stop()
-    sc.stop()
-
-    # Collect data preprocessing results from Calvin and start next
-    # processing on data in Spark
-    CalvinToSpark().evaluate()
-
-
-
+    publishFromQueue()

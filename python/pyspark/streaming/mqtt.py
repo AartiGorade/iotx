@@ -17,6 +17,7 @@
 
 import hashlib
 
+from DagModification import DagModification
 from py4j.protocol import Py4JJavaError
 from pyspark.serializers import UTF8Deserializer
 from pyspark.storagelevel import StorageLevel
@@ -54,30 +55,25 @@ class MQTTUtils(object):
                 MQTTUtils._printErrorMsg(ssc.sparkContext)
             raise
 
-        # dstream =
-        # dstream.serializableFunction = "None"
-        # dstream.operation = "createStream"
-        # dstream.additionalInformation = "brokerUrl "+brokerUrl+" topic "+topic
-        #
-        # dstream.addChildInDag(dstream)
+        if(not DagModification.stopDagModification):
+            childInfo = {}
+            # if hasattr(child, "prev"):
+            childInfo["seqNum"] = DStream.sequenceNum
+            DStream.sequenceNum += 1
+            childInfo["operation"] = "createStream"
+            source ={}
+            source["type"] = "MQTT"
+            source["address"] = brokerUrl
 
-        childInfo = {}
-        # if hasattr(child, "prev"):
-        childInfo["seqNum"] = DStream.sequenceNum
-        DStream.sequenceNum += 1
-        childInfo["operation"] = "createStream"
-        source ={}
-        source["type"] = "MQTT"
-        source["address"] = brokerUrl
+            source["channel"] = list(PahoMQTT.PahoMQTT.topicNames)
+            childInfo["source"] = source
 
-        source["channel"] = list(PahoMQTT.PahoMQTT.topicNames)
-        childInfo["source"] = source
+            childInfo["uid"] = hashlib.sha224(
+                childInfo["operation"] + source["type"]+source["address"]+str(len(source["channel"]))).hexdigest()
 
-        childInfo["uid"] = hashlib.sha224(
-            childInfo["operation"] + source["type"]+source["address"]+str(len(source["channel"]))).hexdigest()
+            DStream.parentId = childInfo["uid"]
+            DStream.sparkDAG.append(childInfo)
 
-        DStream.parentId = childInfo["uid"]
-        DStream.sparkDAG.append(childInfo)
         return DStream(jstream, ssc, UTF8Deserializer())
 
     @staticmethod

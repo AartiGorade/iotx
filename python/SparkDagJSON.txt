@@ -1,10 +1,8 @@
-### Sample DAG JSON sent from Apache Spark to Calvin
-
 [
 	{
 		"seqNum": 0,
 		"operation": "createStream",
-		"uid": "759aa29bb0713f750b00ba18906d2570651fe91d0657130852707752",
+		"uid": "6b0fbf374243e6f7785ddc51cdc64363c321b89df6e37e9af9660cc0",
 		"source":
 			{
 				"type": "MQTT",
@@ -17,44 +15,44 @@
 						"edu/rit/iotx/fb36aa87-115b-4b62-94f1-68563b13e6f4/temperature",
 						"edu/rit/iotx/3a51a92c-ed19-4dc9-80a8-56ed7a78cdd1/temperature"
 					],
-				"address": "tcp://iot.eclipse.org:1883"
+				"address": "iot.eclipse.org::1883"
 			}
 	},
 	{
-		"seqNum": 1,
-		"closure": "gAJjZGlsbC5kaWxsCl9jcmVhdGVfZnVuY3Rpb24KcQAoY2RpbGwuZGlsbApfbG9hZF90eXBlCnEBVQhDb2RlVHlwZXEChXEDUnEEKEsBSwFLAktDVQ18AABqAABkAQCDAQBTcQVOVQEgcQaGcQdVBXNwbGl0cQiFcQlVBGxpbmVxCoVxC1U5L1VzZXJzL0FhcnRpL0lkZWFQcm9qZWN0cy9zcGFyay9weXRob24vU3BhcmtNUVRUU3RhZ2UyLnB5cQxVCDxsYW1iZGE+cQ1L+1UAcQ4pKXRxD1JxEGNfX2J1aWx0aW5fXwpfX21haW5fXwpoDU5OfXERdHESUnETLg==",
+		"closure": "gAJjZGlsbC5kaWxsCl9jcmVhdGVfZnVuY3Rpb24KcQAoY2RpbGwuZGlsbApfbG9hZF90eXBlCnEBVQhDb2RlVHlwZXEChXEDUnEEKEsBSwFLAktDVQp0AAB8AACDAQBTcQVOhXEGVQVmbG9hdHEHhXEIVQRsaW5lcQmFcQpVOS9Vc2Vycy9BYXJ0aS9JZGVhUHJvamVjdHMvc3BhcmsvcHl0aG9uL1NwYXJrTVFUVFN0YWdlMi5weXELVQg8bGFtYmRhPnEMTRcBVQBxDSkpdHEOUnEPY19fYnVpbHRpbl9fCl9fbWFpbl9fCmgMTk59cRB0cRFScRIu",
 		"rddType": "MapPartitionsRDD",
-		"parent": "759aa29bb0713f750b00ba18906d2570651fe91d0657130852707752",
+		"parent": "6b0fbf374243e6f7785ddc51cdc64363c321b89df6e37e9af9660cc0",
+		"seqNum": 1,
 		"operationType": "Transformation",
 		"operation": "map",
-		"uid": "d0bfa88d2a18d4da0e4b78ca352064e945d0766b8a25e86cd291b20c"
+		"uid": "392ffed5d4a41a5f7e1aa7371eadc98e07c1ec55ea25ea79461a8a94"
 	},
 	{
-		"seqNum": 2,
-		"closure": "gAJjZGlsbC5kaWxsCl9jcmVhdGVfZnVuY3Rpb24KcQAoY2RpbGwuZGlsbApfbG9hZF90eXBlCnEBVQhDb2RlVHlwZXEChXEDUnEEKEsBSwFLBEtDVS90AAB0AQB8AABkAQAZgwEAZAIAFGQDABVkBAAXgwEAagIAZAUAgwEAZAYAZgIAU3EFKE5LAEsJSwVLIFUFdXRmLThxBksBdHEHVQNzdHJxCFUFZmxvYXRxCVUGZGVjb2RlcQqHcQtVBHRlbXBxDIVxDVU5L1VzZXJzL0FhcnRpL0lkZWFQcm9qZWN0cy9zcGFyay9weXRob24vU3BhcmtNUVRUU3RhZ2UyLnB5cQ5VCDxsYW1iZGE+cQ9L/1UAcRApKXRxEVJxEmNfX2J1aWx0aW5fXwpfX21haW5fXwpoD05OfXETdHEUUnEVLg==",
+		"closure": "gAJjZGlsbC5kaWxsCl9jcmVhdGVfZnVuY3Rpb24KcQAoY2RpbGwuZGlsbApfbG9hZF90eXBlCnEBVQhDb2RlVHlwZXEChXEDUnEEKEsBSwFLA0tDVSl0AAB8AABkAQAZZAIAFGQDABVkBAAXgwEAagEAZAUAgwEAZAYAZgIAU3EFKE5LAEsJSwVLIFUFdXRmLThxBksBdHEHVQNzdHJxCFUGZGVjb2RlcQmGcQpVBHRlbXBxC4VxDFU5L1VzZXJzL0FhcnRpL0lkZWFQcm9qZWN0cy9zcGFyay9weXRob24vU3BhcmtNUVRUU3RhZ2UyLnB5cQ1VCDxsYW1iZGE+cQ5NGwFVAHEPKSl0cRBScRFjX19idWlsdGluX18KX19tYWluX18KaA5OTn1xEnRxE1JxFC4=",
 		"rddType": "MapPartitionsRDD",
-		"parent": "d0bfa88d2a18d4da0e4b78ca352064e945d0766b8a25e86cd291b20c",
+		"parent": "392ffed5d4a41a5f7e1aa7371eadc98e07c1ec55ea25ea79461a8a94",
+		"seqNum": 2,
 		"operationType": "Transformation",
 		"operation": "map",
-		"uid": "3789d5ad2677286d3473ebadaf2292dc9d228c5eaec1cde277ae8228"
+		"uid": "44adad529e864ebbc95884b4d2c5b897a9fa95f02d8424f16bdf24c4"
 	},
 	{
 		"seqNum": 3,
 		"operation": "pprint",
 		"operationType": "Action",
-		"parent": "3789d5ad2677286d3473ebadaf2292dc9d228c5eaec1cde277ae8228",
-		"uid": "8fcdb14193cf4d1781cbc84c72872d0d50b2b1a2256187172a55a08b"
+		"parent": "44adad529e864ebbc95884b4d2c5b897a9fa95f02d8424f16bdf24c4",
+		"uid": "629df296016b64ccfb04b09a5d0a68df67e0368c7545694f7ddc2eaf"
 	},
 	{
 		"seqNum": 4,
-		"operation": "publish",
+		"operation": "publish", 
 		"sink":
 			{
-			"type": "MQTT",
-			"channel": "edu/rit/iotx/cloud/dag",
-			"address": "iot.eclipse.org:1883"
+				"type": "MQTT",
+				"channel": "edu/rit/iotx/cloud/dag",
+				"address": "iot.eclipse.org:1883"
 			},
-		"parent": "8fcdb14193cf4d1781cbc84c72872d0d50b2b1a2256187172a55a08b",
-		"uid": "73d74deb0edb784d0da6659b185a6c4258e91bdf268eec1ef7f7ae5e"
+		"parent": "629df296016b64ccfb04b09a5d0a68df67e0368c7545694f7ddc2eaf",
+		"uid": "11264969a2b9e118664ea2b157a00ea75ca4ff416f2076883fda703a"
 	}
 ]

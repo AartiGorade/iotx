@@ -35,6 +35,8 @@ from pyspark.streaming.util import rddToFileName, TransformFunction
 from pyspark.rdd import portable_hash
 from pyspark.resultiterable import ResultIterable
 
+from DagModification import DagModification
+
 __all__ = ["DStream"]
 
 
@@ -150,11 +152,14 @@ class DStream(object):
             return map(f, iterator)
 
         mapDstream = self.mapPartitions(func, preservesPartitioning)
-        mapDstream.serializableFunction = serialized
-        mapDstream.rddType = "MapPartitionsRDD"
-        mapDstream.operationType = "Transformation"
-        mapDstream.operation = "map"
-        self.addChildInDag(mapDstream)
+
+        if(not DagModification.stopDagModification):
+            mapDstream.serializableFunction = serialized
+            mapDstream.rddType = "MapPartitionsRDD"
+            mapDstream.operationType = "Transformation"
+            mapDstream.operation = "map"
+            self.addChildInDag(mapDstream)
+
         return mapDstream
 
     def mapPartitions(self, f, preservesPartitioning=False):
@@ -233,12 +238,13 @@ class DStream(object):
         @param num: the number of elements from the first will be printed.
         """
 
-        mapDstream = self
-        # mapDstream.serializableFunction = "None"
-        # mapDstream.rddType = "Value"
-        mapDstream.operationType = "Action"
-        mapDstream.operation = "pprint"
-        self.addChildInDag(mapDstream)
+        if(not DagModification.stopDagModification):
+            mapDstream = self
+            # mapDstream.serializableFunction = "None"
+            # mapDstream.rddType = "Value"
+            mapDstream.operationType = "Action"
+            mapDstream.operation = "pprint"
+            self.addChildInDag(mapDstream)
 
         def takeAndPrint(time, rdd):
             taken = rdd.take(num + 1)
